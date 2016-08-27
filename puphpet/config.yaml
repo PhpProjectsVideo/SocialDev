@@ -117,7 +117,7 @@ nginx:
     vhosts:
         nxv_yx27npm49l2s:
             server_name: beantsalkd.dev
-            www_root: /var/www/html/beanstalk_console
+            www_root: /var/www/html
             listen_port: '80'
             index_files:
                 - index.html
@@ -133,7 +133,7 @@ nginx:
             rewrite_to_https: '1'
             spdy: '1'
             locations:
-                nxvl_eqflrtx3y158:
+                nxvl_eqflrtx3y159:
                     location: /
                     try_files:
                         - $uri
@@ -144,7 +144,7 @@ nginx:
                     fastcgi_split_path: ''
                     proxy: ''
                     proxy_redirect: ''
-                nxvl_iielax8v2pgy:
+                nxvl_iielax8v2pgz:
                     location: '~ \.php$'
                     try_files:
                         - $uri
