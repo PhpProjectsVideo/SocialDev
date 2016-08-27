@@ -1,0 +1,4 @@
+puphpet/config-custom.yaml
+.idea/
+.vagrant/
+/social.dev/vendor/
