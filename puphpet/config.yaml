@@ -99,7 +99,11 @@ locale:
         timezone: UTC
 firewall:
     install: '1'
-    rules: {  }
+    rules:
+        voud9p0Db4Qz:
+            port: [ 3306 ]
+            proto: tcp
+            action: accept
 cron:
     install: '1'
     jobs: {  }
@@ -270,6 +274,7 @@ php:
         php:
             - cli
             - intl
+            - curl
         pear: {  }
         pecl:
             - memcache
@@ -361,11 +366,16 @@ mariadb:
     settings:
         version: '10.1'
         root_password: '123'
-        override_options: {  }
+        override_options:
+            mysqld:
+                bind-address: 0.0.0.0
     adminer: 0
     users:
         mariadbnu_dkr9oyvybfzt:
             name: social
+            password: social123
+        mariadbnu_dkr9oyvybfzu:
+            name: social@192.168.56.%
             password: social123
     databases:
         mariadbnd_ghm52ykjpwm2:
@@ -386,6 +396,30 @@ mariadb:
                 - UPDATE
         mariadbng_wru7o47j9box:
             user: social
+            table: 'social_test.*'
+            privileges:
+                - ALTER
+                - CREATE
+                - DELETE
+                - DROP
+                - INDEX
+                - INSERT
+                - SELECT
+                - UPDATE
+        mariadbng_nwdcsph0008j:
+            user: social@192.168.56.%
+            table: 'social.*'
+            privileges:
+                - ALTER
+                - CREATE
+                - DELETE
+                - DROP
+                - INDEX
+                - INSERT
+                - SELECT
+                - UPDATE
+        mariadbng_wru7o47j9boy:
+            user: social@192.168.56.%
             table: 'social_test.*'
             privileges:
                 - ALTER
