@@ -3,3 +3,4 @@ puphpet/config-custom.yaml
 .vagrant/
 /social.dev/vendor/
 html/
+/social.dev/src/config.local.php

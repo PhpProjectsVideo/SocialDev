@@ -2,14 +2,21 @@
 
 {% block body %}
     <div>
+        {% if error is defined and error %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="danger" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <strong>Error!</strong> {{ error }}
+            </div>
+        {% endif %}
         <div class="jumbotron">
             <h1>Welcome to Social.dev</h1>
-            {% if pageViews == 1 %}
-                <p>Why don't you join us so you can start sharing your awesome Links!</p>
+            {% if app.user %}
+                <p>Hello {{ app.user.username }}! Your email is {{ app.user.email }}</p>
+                <p><a class="btn btn-danger btn-lg" href="{{ app.logout_path }}" role="button">Logout</a></p>
             {% else %}
-                <p>You've looked at this page {{ pageViews }} times. Why don't you join us so you can start sharing your awesome Links!</p>
+                <p>Why don't you join us so you can start sharing your awesome Links!</p>
+                <p><a class="btn btn-primary btn-lg" href="{{ app.login_paths.google }}" role="button">Login</a></p>
             {% endif %}
-            <p><a class="btn btn-primary btn-lg" href="#" role="button">Login</a></p>
         </div>
     </div>
 {% endblock %}
