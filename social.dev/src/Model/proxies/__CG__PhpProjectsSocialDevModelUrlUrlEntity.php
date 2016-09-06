@@ -320,4 +320,15 @@ class UrlEntity extends \PhpProjects\SocialDev\Model\Url\UrlEntity implements \D
         return parent::__toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function fireNewUrlEvent()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'fireNewUrlEvent', []);
+
+        return parent::fireNewUrlEvent();
+    }
+
 }

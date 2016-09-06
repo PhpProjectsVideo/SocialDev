@@ -33,3 +33,5 @@ PhpProjects\SocialDev\Model\Url\UrlEntity:
       type: integer
       options:
         unsigned: true
+  lifecycleCallbacks:
+      postPersist: [ fireNewUrlEvent ]

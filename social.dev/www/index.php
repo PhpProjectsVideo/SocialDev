@@ -125,11 +125,6 @@ $app->match('/user/likeUrl', function (Request $request) use ($app) {
         {
             $urlEntity = new UrlEntity($data['url']);
             $em->persist($urlEntity);
-
-            /* @var $provider HttpUrlService */
-            $provider = $app['url.httpUrlService'];
-            $provider->getUrlEntityFromUrl($urlEntity);
-            $em->flush();
         }
 
         $likedUrlEntity = $user->likeUrl($urlEntity);

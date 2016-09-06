@@ -28,10 +28,6 @@ if (empty($urlEntity))
     $em->persist($urlEntity);
 }
 
-/* @var $provider \PhpProjects\SocialDev\Model\Url\HttpUrlService */
-$provider = $app['url.httpUrlService'];
-$provider->getUrlEntityFromUrl($urlEntity);
-
 $em->flush();
 
 echo "Fetched {$url}: \"{$urlEntity->getTitle()}\"\n";

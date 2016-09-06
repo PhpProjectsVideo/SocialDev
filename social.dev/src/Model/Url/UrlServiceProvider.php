@@ -2,7 +2,9 @@
 
 namespace PhpProjects\SocialDev\Model\Url;
 
+use Doctrine\Common\EventArgs;
 use Goutte\Client as GoutteClient;
+use PhpProjects\SocialDev\Model\DomainEventManager;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
@@ -27,8 +29,23 @@ class UrlServiceProvider implements ServiceProviderInterface
         $app['url.goutte.client'] = function () {
             return new GoutteClient();
         };
+
         $app['url.httpUrlService'] = function ($app) {
             return new HttpUrlService($app['url.goutte.client']);
         };
+
+        $app['url.urlCrawlerWorker'] = function ($app) {
+            return new UrlCrawlerWorker($app['url.httpUrlService'], $app['orm.em'], $app['pheanstalk.client']);
+        };
+
+        DomainEventManager::getInstance()->attachListener(DomainEventManager::EVENT_NEWURL, function ($arguments) use ($app) {
+            /* @var $urlCrawlerWorker UrlCrawlerWorker */
+            $urlCrawlerWorker = $app['url.urlCrawlerWorker'];
+
+            /* @var $url \PhpProjects\SocialDev\Model\Url\UrlEntity */
+            $url = $arguments['url'];
+
+            $urlCrawlerWorker->queueUrl($url->getUrl());
+        });
     }
 }

@@ -7,6 +7,8 @@ CREATE TABLE `session` (
     `session_lifetime` MEDIUMINT NOT NULL
 ) COLLATE utf8_bin, ENGINE = InnoDB;
 
+DROP TABLE IF EXISTS user_url;
+DROP TABLE IF EXISTS url;
 DROP TABLE IF EXISTS user;
 
 CREATE TABLE user (
@@ -23,8 +25,6 @@ CREATE TABLE user (
     COLLATE utf8_unicode_ci
     ENGINE = InnoDB;
 
-DROP TABLE IF EXISTS url;
-
 CREATE TABLE url (
     url_id      VARCHAR(64)   NOT NULL,
     url         VARCHAR(1024) NOT NULL,
@@ -38,8 +38,6 @@ CREATE TABLE url (
     DEFAULT CHARACTER SET utf8
     COLLATE utf8_unicode_ci
     ENGINE = InnoDB;
-
-DROP TABLE IF EXISTS user_url;
 
 CREATE TABLE user_url (
     user_id   INT UNSIGNED NOT NULL,

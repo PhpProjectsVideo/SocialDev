@@ -1,6 +1,7 @@
 <?php
 
 namespace PhpProjects\SocialDev\Model\Url;
+use PhpProjects\SocialDev\Model\DomainEventManager;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -52,6 +53,7 @@ class UrlEntity
     public function __construct(string $url)
     {
         $this->url = $url;
+        $this->title = $url;
         $this->urlId = self::generateUrlHash($url);
     }
 
@@ -156,5 +158,13 @@ class UrlEntity
     public function __toString()
     {
         return $this->getUrl();
+    }
+
+    /**
+     * fires a domain event indicating that a new url has been persisted
+     */
+    public function fireNewUrlEvent()
+    {
+        DomainEventManager::getInstance()->dispatchEvent(DomainEventManager::EVENT_NEWURL, [ 'url' => $this ]);
     }
 }

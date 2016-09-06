@@ -4,9 +4,11 @@ namespace PhpProjects\SocialDev\Application;
 
 use Dflydev\Provider\DoctrineOrm\DoctrineOrmServiceProvider;
 use Gigablah\Silex\OAuth\OAuthServiceProvider;
+use Pheanstalk\Pheanstalk;
 use PhpProjects\SocialDev\Model\Url\UrlServiceProvider;
 use PhpProjects\SocialDev\Model\User\SocialDevUserProvider;
 use PhpProjects\SocialDev\Model\User\UserEntity;
+use PhpProjects\SocialDev\Pheanstalk\PheanstalkProvider;
 use Saxulum\DoctrineOrmManagerRegistry\Provider\DoctrineOrmManagerRegistryProvider;
 use Silex\Application;
 use Silex\Provider\CsrfServiceProvider;
@@ -41,9 +43,9 @@ class SocialApplication extends Application
         $this->register(new DoctrineServiceProvider(), [
             'db.options' => [
                 'driver' => 'pdo_mysql',
-                'dbname' => 'social',
-                'user' => 'social',
-                'password' => 'social123',
+                'dbname' => MYSQL_DBNAME,
+                'user' => MYSQL_USER,
+                'password' => MYSQL_PASS,
             ],
         ]);
 
@@ -68,8 +70,6 @@ class SocialApplication extends Application
         $this->register(new SessionServiceProvider(), [
             'session.db_options' => [
                 'db_table'        => 'session',
-                'db_id_col'       => 'session_id',
-                'db_id_col'       => 'session_id',
                 'db_id_col'       => 'session_id',
                 'db_data_col'     => 'session_value',
                 'db_lifetime_col' => 'session_lifetime',
@@ -143,6 +143,20 @@ class SocialApplication extends Application
         $this->register(new DoctrineOrmManagerRegistryProvider());
 
         $this->register(new UrlServiceProvider());
+        
+        $this->register(new PheanstalkProvider(), [
+            'pheanstalk.config' => [
+                'host' => PHEANSTALK_HOST,
+                'port' => PHEANSTALK_PORT,
+            ],
+        ]);
     }
 
+    /**
+     * @return Pheanstalk
+     */
+    public function getBeanstalkClient()
+    {
+        return $this['pheanstalk.client'];
+    }
 }
