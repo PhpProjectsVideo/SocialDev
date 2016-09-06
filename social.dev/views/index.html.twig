@@ -28,5 +28,74 @@
                 <p><a class="btn btn-primary btn-lg" href="{{ app.login_paths.google }}" role="button">Login</a></p>
             {% endif %}
         </div>
+        <h2>Recent URLs</h2>
+        <div id="url-list" class="row" data-lasttime="{{ urls[0].timestamp|default(0) }}">
+            {% for url in urls %}
+                <div class="col-md-3">
+                    <div class="thumbnail">
+                        <a href="{{ url.url }}">
+                            <img src="{{ url.imageUrl }}">
+                        </a>
+                        <div class="caption">
+                            <h5><a href="{{ url.url }}" class="truncate-one-line">{{ url.title }}</a>
+                            <span class="truncate-one-line">{{ url.user.username|default('Anonymous') }} @ {{ url.timestamp|date('F j, Y @ g:i a') }}</span></h5>
+                            <p class="truncate-four-lines">{{ url.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
+    <div id="url-template" style="display: none">
+        <div class="col-md-3">
+            <div class="thumbnail">
+                <a data-url-url href="">
+                    <img data-url-thumbnail src="">
+                </a>
+                <div class="caption">
+                    <h5><a data-url-url data-url-title href="" class="truncate-one-line"></a>
+                        <span class="truncate-one-line"><span data-url-user></span> @ <span data-url-timestamp></span></span></h5>
+                    <p data-url-description class="truncate-four-lines"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function poll(){
+            setTimeout(function(){
+                $.ajax({
+                    url: "/poll/newUrls",
+                    data: {
+                        timestamp: $('#url-list').data('lasttime')
+                    },
+                    success: function(data){
+                        var insertBefore = $('#url-list').children(':first');
+
+                        if (data.urls.length > 0)
+                        {
+                            $('#url-list').data('lasttime', data.urls[0].timestamp);
+                        }
+                        $.each(data.urls, function (k, url) {
+                            var container = $("#url-template").children(':first').clone();
+
+                            container.find("[data-url-url]").attr('href', url.url);
+                            container.find("[data-url-thumbnail]").attr('src', url.imageUrl);
+                            container.find("[data-url-title]").text(url.title);
+                            container.find("[data-url-user]").text(url.username);
+                            container.find("[data-url-timestamp]").text(url.date);
+                            container.find("[data-url-description]").text(url.description);
+
+                            insertBefore.before(container);
+                        });
+                        //Setup the next poll recursively
+                        poll();
+                    },
+                    error: function () {
+                        poll();
+                    },
+                    dataType: "json"
+                });
+            }, 1000);
+        })();
+    </script>
 {% endblock %}

@@ -21,5 +21,34 @@ class UrlEntityRepository extends EntityRepository
         $urlId = UrlEntity::generateUrlHash($url);
         
         return $this->find($urlId);
-   }
+    }
+
+    /**
+     * Gets the most recent urls since the given timestamp
+     * 
+     * @param int $timestamp
+     * @return array
+     */
+    public function getMostRecentUrlsSince($timestamp = 0)
+    {
+        $builder = $this->createQueryBuilder('url');
+
+        $andWhere = $builder->expr()->andX(
+            $builder->expr()->eq('url.status', UrlEntity::STATUS_DATA_LOADED)
+        );
+
+        if ($timestamp)
+        {
+            $andWhere->add(
+                $builder->expr()->gt('url.timestamp', ':timestamp')
+            );
+            $builder->setParameter('timestamp', $timestamp);
+        }
+        $builder->where($andWhere);
+
+        $builder->orderBy('url.timestamp', 'DESC')
+            ->setMaxResults(10);
+
+        return $builder->getQuery()->getResult();
+    }
 }

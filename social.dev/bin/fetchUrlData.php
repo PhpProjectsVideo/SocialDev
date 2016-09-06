@@ -24,7 +24,7 @@ $urlRepository = $em->getRepository(UrlEntity::class);
 $urlEntity = $urlRepository->getOneByUrl($url);
 if (empty($urlEntity))
 {
-    $urlEntity = new UrlEntity($url);
+    $urlEntity = new UrlEntity($url, time());
     $em->persist($urlEntity);
 }
 

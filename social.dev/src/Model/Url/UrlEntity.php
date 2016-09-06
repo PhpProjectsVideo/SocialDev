@@ -2,6 +2,7 @@
 
 namespace PhpProjects\SocialDev\Model\Url;
 use PhpProjects\SocialDev\Model\DomainEventManager;
+use PhpProjects\SocialDev\Model\User\UserEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -49,12 +50,23 @@ class UrlEntity
      * @var int
      */
     private $status = self::STATUS_LOADING_DATA;
+
+    /**
+     * @var UserEntity
+     */
+    private $user;
+
+    /**
+     * @var int
+     */
+    private $timestamp;
     
-    public function __construct(string $url)
+    public function __construct(string $url, int $timestamp)
     {
         $this->url = $url;
         $this->title = $url;
         $this->urlId = self::generateUrlHash($url);
+        $this->timestamp = $timestamp;
     }
 
     public static function generateUrlHash(string $url) : string
@@ -153,6 +165,30 @@ class UrlEntity
     public function setDataLoaded()
     {
         $this->status = self::STATUS_DATA_LOADED;
+    }
+
+    /**
+     * @return UserEntity
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param UserEntity $user
+     */
+    public function setUser(UserEntity $user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimestamp() : int
+    {
+        return $this->timestamp;
     }
 
     public function __toString()

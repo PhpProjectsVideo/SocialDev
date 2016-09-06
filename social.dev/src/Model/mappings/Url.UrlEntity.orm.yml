@@ -33,5 +33,19 @@ PhpProjects\SocialDev\Model\Url\UrlEntity:
       type: integer
       options:
         unsigned: true
+    timestamp:
+      type: integer
+      options:
+        unsigned: true
+  manyToOne:
+    user:
+      targetEntity: PhpProjects\SocialDev\Model\User\UserEntity
+      nullable: true
+      joinColumn:
+        name: user_id
+        referencedColumnName: user_id
+  indexes:
+    timestamp_idx:
+      columns: [ timestamp ]
   lifecycleCallbacks:
       postPersist: [ fireNewUrlEvent ]

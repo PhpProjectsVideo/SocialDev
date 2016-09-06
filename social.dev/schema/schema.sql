@@ -27,17 +27,24 @@ CREATE TABLE user (
 
 CREATE TABLE url (
     url_id      VARCHAR(64)   NOT NULL,
+    user_id     INT UNSIGNED  DEFAULT NULL,
     url         VARCHAR(1024) NOT NULL,
     title       VARCHAR(255)  NOT NULL,
     description LONGTEXT      DEFAULT NULL,
     keywords    LONGTEXT      DEFAULT NULL,
     image_url   VARCHAR(1024) DEFAULT NULL,
     status      INT UNSIGNED  NOT NULL,
+    timestamp   INT UNSIGNED  NOT NULL,
+    INDEX IDX_F47645AEA76ED395 (user_id),
+    INDEX timestamp_idx (timestamp),
     PRIMARY KEY (url_id)
 )
     DEFAULT CHARACTER SET utf8
     COLLATE utf8_unicode_ci
     ENGINE = InnoDB;
+
+ALTER TABLE url
+    ADD CONSTRAINT FK_F47645AEA76ED395 FOREIGN KEY (user_id) REFERENCES user (user_id);
 
 CREATE TABLE user_url (
     user_id   INT UNSIGNED NOT NULL,

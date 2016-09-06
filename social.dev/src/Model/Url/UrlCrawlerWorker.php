@@ -4,6 +4,7 @@ namespace  PhpProjects\SocialDev\Model\Url;
 
 use Doctrine\ORM\EntityManager;
 use Pheanstalk\Pheanstalk;
+use Pheanstalk\PheanstalkInterface;
 
 /**
  * Manages interactions of our url crawler with our job queue system
@@ -87,6 +88,6 @@ class UrlCrawlerWorker
      */
     public function queueUrl(string $url)
     {
-        $this->queue->putInTube(self::BEANSTALKD_TUBE, $url);
+        $this->queue->putInTube(self::BEANSTALKD_TUBE, $url, PheanstalkInterface::DEFAULT_PRIORITY, 1);
     }
 }

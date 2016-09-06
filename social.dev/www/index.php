@@ -48,9 +48,16 @@ $app->get('/', function (Request $request) use ($app) {
 
     $form = $app->form($data, [], RegistrationFormType::class)->getForm();
 
+    /* @var $em EntityManager */
+    $em = $app['orm.em'];
+
+    /* @var $urlRepository UrlEntityRepository */
+    $urlRepository = $em->getRepository(UrlEntity::class);
+
     return $app->render('index.html.twig', [
         'error' => $app['security.last_error']($request),
         'form' => $form->createView(),
+        'urls' => $urlRepository->getMostRecentUrlsSince(),
     ]);
 })->bind('home');
 
@@ -123,7 +130,8 @@ $app->match('/user/likeUrl', function (Request $request) use ($app) {
         $urlEntity = $repo->getOneByUrl($data['url']);
         if (empty($urlEntity))
         {
-            $urlEntity = new UrlEntity($data['url']);
+            $urlEntity = new UrlEntity($data['url'], time());
+            $urlEntity->setUser($user);
             $em->persist($urlEntity);
         }
 
@@ -145,6 +153,50 @@ $app->match('/user/likeUrl', function (Request $request) use ($app) {
         'form' => $form->createView(),
     ]);
 })->bind('likeUrl');
+
+$app->get('/poll/newUrls', function (Request $request) use ($app) {
+    /* @var $em EntityManager */
+    $em = $app['orm.em'];
+    $timestamp = $request->get('timestamp') ?? 0;
+
+    /* @var $urlRepository UrlEntityRepository */
+    $urlRepository = $em->getRepository(UrlEntity::class);
+
+    $startTime = time();
+
+    //before we enter our loop we should let our session expire
+    /* @var $session \Symfony\Component\HttpFoundation\Session\Session */
+    $session = $app['session'];
+    $session->save();
+    while (time() < $startTime + 10)
+    {
+        $urls = [];
+        /* @var $url UrlEntity */
+        foreach ($urlRepository->getMostRecentUrlsSince($timestamp) as $url)
+        {
+            $urls[] = [
+                'url' => $url->getUrl(),
+                'imageUrl' => $url->getImageUrl(),
+                'title' => $url->getTitle(),
+                'username' => $url->getUser() ? $url->getUser()->getUsername() : 'Anonymous',
+                'description' => $url->getDescription(),
+                'date' => date('F j, Y @ g:i a', $url->getTimestamp()),
+                'timestamp' => $url->getTimestamp(),
+            ];
+        }
+
+        if (count($urls))
+        {
+            return $app->json([
+                'urls' => $urls,
+            ]);
+        }
+
+        sleep(1);
+    }
+
+    return $app->json([ 'urls' => [] ]);
+});
 
 $app->match('/logout', function () {})->bind('logout');
 //endregion
