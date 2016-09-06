@@ -29,3 +29,7 @@ PhpProjects\SocialDev\Model\Url\UrlEntity:
       length: 1024
       nullable: true
       column: image_url
+    status:
+      type: integer
+      options:
+        unsigned: true

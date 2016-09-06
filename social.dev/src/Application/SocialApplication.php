@@ -127,6 +127,7 @@ class SocialApplication extends Application
             'security.access_rules' => [
                 ['^/auth', 'ROLE_USER'],
                 ['^/register', 'ROLE_USER'],
+                ['^/user/', 'ROLE_USER'],
             ]
         ]);
 

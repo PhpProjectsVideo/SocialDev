@@ -32,8 +32,30 @@ CREATE TABLE url (
     description LONGTEXT      DEFAULT NULL,
     keywords    LONGTEXT      DEFAULT NULL,
     image_url   VARCHAR(1024) DEFAULT NULL,
+    status      INT UNSIGNED  NOT NULL,
     PRIMARY KEY (url_id)
 )
     DEFAULT CHARACTER SET utf8
     COLLATE utf8_unicode_ci
     ENGINE = InnoDB;
+
+DROP TABLE IF EXISTS user_url;
+
+CREATE TABLE user_url (
+    user_id   INT UNSIGNED NOT NULL,
+    url_id    VARCHAR(64)  NOT NULL,
+    timestamp INT UNSIGNED NOT NULL,
+    INDEX IDX_1F602425A76ED395 (user_id),
+    INDEX IDX_1F60242581CFDAE7 (url_id),
+    UNIQUE INDEX user_url (url_id, user_id),
+    PRIMARY KEY (user_id, url_id)
+)
+    DEFAULT CHARACTER SET utf8
+    COLLATE utf8_unicode_ci
+    ENGINE = InnoDB;
+
+ALTER TABLE user_url
+    ADD CONSTRAINT FK_1F602425A76ED395 FOREIGN KEY (user_id) REFERENCES user (user_id);
+
+ALTER TABLE user_url
+    ADD CONSTRAINT FK_1F60242581CFDAE7 FOREIGN KEY (url_id) REFERENCES url (url_id);

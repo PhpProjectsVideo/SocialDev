@@ -59,6 +59,8 @@ class HttpUrlService
         $keywords = $nodes['meta:keywords']
             ?? null;
         $urlEntity->setKeywords($keywords);
+        
+        $urlEntity->setDataLoaded();
     }
 
     /**

@@ -1,10 +1,16 @@
 <?php
 
+use Doctrine\ORM\EntityManager;
 use PhpProjects\SocialDev\Application\SocialApplication;
+use PhpProjects\SocialDev\Model\Url\HttpUrlService;
+use PhpProjects\SocialDev\Model\Url\UrlEntity;
+use PhpProjects\SocialDev\Model\Url\UrlEntityRepository;
 use PhpProjects\SocialDev\Model\User\UserEntity;
 use PhpProjects\SocialDev\UI\FormTypes\RegistrationFormType;
+use PhpProjects\SocialDev\UI\FormTypes\UrlFormType;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 require_once __DIR__.'/../vendor/autoload.php';
 require __DIR__.'/../src/config.php';
@@ -32,6 +38,11 @@ $app->before(function () use ($app) {
 
 //region Routes
 $app->get('/', function (Request $request) use ($app) {
+
+    if (!empty($app['user']) && $app['user']->isFullyRegistered())
+    {
+        return $app->redirect($app->url('user'));
+    }
 
     $data = $app['user'] ?: new UserEntity();
 
@@ -70,6 +81,75 @@ $app->match('/register', function (Request $request) use ($app) {
         'form' => $form->createView(),
     ]);
 })->bind('register');
+
+
+$app->get('/user/', function (Request $request) use ($app) {
+    $form = $app->form([], [], UrlFormType::class)->getForm();
+
+    /* @var $em EntityManager */
+    $em = $app['orm.em'];
+
+    /* @var $likeUrlRepo \PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntityRepository */
+    $likeUrlRepo = $em->getRepository(\PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntity::class);
+    
+    $likedUrls = $likeUrlRepo->getRecentLikedUrls($app['user']);
+
+    return $app->render('user/index.html.twig', [
+        'form' => $form->createView(),
+        'likedUrls' => $likedUrls
+    ]);
+})->bind('user');
+
+
+$app->match('/user/likeUrl', function (Request $request) use ($app) {
+    /* @var $em EntityManager */
+    $em = $app['orm.em'];
+
+    $data = $request->get('url_form', []);
+    $form = $app->form($data, [], UrlFormType::class)->getForm();
+
+    $form->handleRequest($request);
+
+    if ($form->isValid())
+    {
+        $data = $form->getData();
+
+        /* @var $user UserEntity */
+        $user = $app['user'];
+
+        /* @var $repo UrlEntityRepository */
+        $repo = $em->getRepository(UrlEntity::class);
+
+        $urlEntity = $repo->getOneByUrl($data['url']);
+        if (empty($urlEntity))
+        {
+            $urlEntity = new UrlEntity($data['url']);
+            $em->persist($urlEntity);
+
+            /* @var $provider HttpUrlService */
+            $provider = $app['url.httpUrlService'];
+            $provider->getUrlEntityFromUrl($urlEntity);
+            $em->flush();
+        }
+
+        $likedUrlEntity = $user->likeUrl($urlEntity);
+
+        /* @var $validator ValidatorInterface */
+        $validator = $app['validator'];
+
+        $errors = $validator->validate($likedUrlEntity);
+        if (count($errors) == 0)
+        {
+            $em->persist($likedUrlEntity);
+            $em->flush();
+        }
+
+        return $app->redirect($app['url_generator']->generate('user'));
+    }
+    return $app->render('user/likeUrl.html.twig', [
+        'form' => $form->createView(),
+    ]);
+})->bind('likeUrl');
 
 $app->match('/logout', function () {})->bind('logout');
 //endregion

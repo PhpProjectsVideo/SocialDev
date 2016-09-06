@@ -1,0 +1,28 @@
+PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntity:
+  type: entity
+  repositoryClass: PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntityRepository
+  table: user_url
+  id:
+    url:
+      associationKey: true
+    user:
+      associationKey: true
+  fields:
+    timestamp:
+      type: integer
+      options:
+        unsigned: true
+  manyToOne:
+    user:
+      targetEntity: PhpProjects\SocialDev\Model\User\UserEntity
+      joinColumn:
+        name: user_id
+        referencedColumnName: user_id
+    url:
+      targetEntity: PhpProjects\SocialDev\Model\Url\UrlEntity
+      joinColumn:
+        name: url_id
+        referencedColumnName: url_id
+  uniqueConstraints:
+    user_url:
+      columns: [ url_id, user_id ]

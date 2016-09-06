@@ -64,10 +64,10 @@ class UrlEntity extends \PhpProjects\SocialDev\Model\Url\UrlEntity implements \D
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'urlId', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'url', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'title', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'description', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'keywords', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'imageUrl'];
+            return ['__isInitialized__', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'urlId', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'url', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'title', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'description', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'keywords', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'imageUrl', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'status'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'urlId', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'url', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'title', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'description', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'keywords', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'imageUrl'];
+        return ['__isInitialized__', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'urlId', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'url', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'title', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'description', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'keywords', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'imageUrl', '' . "\0" . 'PhpProjects\\SocialDev\\Model\\Url\\UrlEntity' . "\0" . 'status'];
     }
 
     /**
@@ -285,6 +285,39 @@ class UrlEntity extends \PhpProjects\SocialDev\Model\Url\UrlEntity implements \D
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setImageUrl', [$imageUrl]);
 
         return parent::setImageUrl($imageUrl);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isDataLoaded()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isDataLoaded', []);
+
+        return parent::isDataLoaded();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setDataLoaded()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setDataLoaded', []);
+
+        return parent::setDataLoaded();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __toString()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', []);
+
+        return parent::__toString();
     }
 
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace PhpProjects\SocialDev\Model\Url;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Represents a url in the system
@@ -9,6 +10,10 @@ namespace PhpProjects\SocialDev\Model\Url;
  */
 class UrlEntity
 {
+    const STATUS_LOADING_DATA = 1;
+
+    const STATUS_DATA_LOADED = 2;
+    
     /**
      * @var string
      */
@@ -38,6 +43,11 @@ class UrlEntity
      * @var string
      */
     private $imageUrl;
+
+    /**
+     * @var int
+     */
+    private $status = self::STATUS_LOADING_DATA;
     
     public function __construct(string $url)
     {
@@ -128,5 +138,23 @@ class UrlEntity
     public function setImageUrl($imageUrl)
     {
         $this->imageUrl = $imageUrl;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDataLoaded()
+    {
+        return $this->status == self::STATUS_DATA_LOADED;
+    }
+
+    public function setDataLoaded()
+    {
+        $this->status = self::STATUS_DATA_LOADED;
+    }
+
+    public function __toString()
+    {
+        return $this->getUrl();
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
 namespace PhpProjects\SocialDev\Model\User;
+use PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntity;
+use PhpProjects\SocialDev\Model\Url\UrlEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -30,6 +32,11 @@ class UserEntity implements UserInterface
      * @var string
      */
     private $username;
+
+    /**
+     * @var array
+     */
+    private $urlIds;
 
 
     /**
@@ -176,6 +183,17 @@ class UserEntity implements UserInterface
     }
 
     /**
+     * Marks a given url as liked by the current user
+     * 
+     * @param UrlEntity $url
+     * @return LikedUrlEntity
+     */
+    public function likeUrl(UrlEntity $url) : LikedUrlEntity
+    {
+        return new LikedUrlEntity($this, $url, time());
+    }
+
+    /**
      * Validations to run for this entity
      * 
      * @param ClassMetadata $metadata
@@ -191,6 +209,11 @@ class UserEntity implements UserInterface
         ]));
 
         $metadata->addPropertyConstraint('username', new Assert\NotBlank());
+    }
+
+    public function __toString()
+    {
+        return $this->getUsername();
     }
 }
 
