@@ -6,6 +6,12 @@
             <h1>Welcome {{ app.user.username }}</h1>
         </div>
     </div>
+    {% if flashMessage %}
+        <div class="alert alert-{{ flashMessageType }} alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>{{ flashMessageType|upper }}!</strong> {{ flashMessage }}.
+        </div>
+    {% endif %}
     <div class="row">
         <div class="col-md-6">
             <form method="post" action="{{ app.url_generator.generate('likeUrl') }}">
@@ -15,6 +21,23 @@
             </form>
         </div>
         <div class="col-md-6">
+            {% if followedUsers|length %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Followed Users</h3>
+                    </div>
+                    <ul class="list-group">
+                        {% for user in followedUsers %}
+                            <li class="list-group-item">
+                                <h4>
+                                    <a href="{{ app.url('public-user', { 'username' : user.username }) }}">{{ user.username }}</a>
+                                    <a class="btn btn-default btn-sm" href="{{ app.url('unfollow-user', {'username' : user.username} ) }}">Unfollow User</a>
+                                </h4>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
             {% if similarUsers|length %}
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -23,7 +46,10 @@
                     <ul class="list-group">
                         {% for user in similarUsers %}
                             <li class="list-group-item">
-                                <h4><a href="{{ app.url('public-user', { 'username' : user.username }) }}">{{ user.username }}</a></h4>
+                                <h4>
+                                    <a href="{{ app.url('public-user', { 'username' : user.username }) }}">{{ user.username }}</a>
+                                    <a class="btn btn-default btn-sm" href="{{ app.url('follow-user', {'username' : user.username} ) }}">Follow User</a>
+                                </h4>
                             </li>
                         {% endfor %}
                     </ul>

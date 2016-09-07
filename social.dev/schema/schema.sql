@@ -7,6 +7,7 @@ CREATE TABLE `session` (
     `session_lifetime` MEDIUMINT NOT NULL
 ) COLLATE utf8_bin, ENGINE = InnoDB;
 
+DROP TABLE IF EXISTS user_follower;
 DROP TABLE IF EXISTS user_url;
 DROP TABLE IF EXISTS url;
 DROP TABLE IF EXISTS user;
@@ -64,3 +65,22 @@ ALTER TABLE user_url
 
 ALTER TABLE user_url
     ADD CONSTRAINT FK_1F60242581CFDAE7 FOREIGN KEY (url_id) REFERENCES url (url_id);
+
+CREATE TABLE user_follower (
+    followee_id INT UNSIGNED NOT NULL,
+    follower_id INT UNSIGNED NOT NULL,
+    timestamp   INT UNSIGNED NOT NULL,
+    INDEX IDX_595BED4661EA9775 (followee_id),
+    INDEX IDX_595BED46AC24F853 (follower_id),
+    PRIMARY KEY (followee_id, follower_id)
+)
+    DEFAULT CHARACTER SET utf8
+    COLLATE utf8_unicode_ci
+    ENGINE = InnoDB;
+
+ALTER TABLE user_follower
+    ADD CONSTRAINT FK_595BED4661EA9775 FOREIGN KEY (followee_id) REFERENCES user (user_id);
+
+ALTER TABLE user_follower
+    ADD CONSTRAINT FK_595BED46AC24F853 FOREIGN KEY (follower_id) REFERENCES user (user_id);
+

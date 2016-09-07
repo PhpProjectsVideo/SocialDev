@@ -8,6 +8,7 @@ use PhpProjects\SocialDev\Model\Url\UrlEntity;
 use PhpProjects\SocialDev\Model\Url\UrlEntityRepository;
 use PhpProjects\SocialDev\Model\User\UserEntity;
 use PhpProjects\SocialDev\Model\User\UserEntityRepository;
+use PhpProjects\SocialDev\Model\User\UserFollowerEntity;
 use PhpProjects\SocialDev\Search\UserIndexingService;
 use PhpProjects\SocialDev\UI\FormTypes\RegistrationFormType;
 use PhpProjects\SocialDev\UI\FormTypes\UrlFormType;
@@ -96,6 +97,9 @@ $app->match('/register', function (Request $request) use ($app) {
 $app->get('/user/', function (Request $request) use ($app) {
     $form = $app->form([], [], UrlFormType::class)->getForm();
 
+    /* @var $user UserEntity */
+    $user = $app['user'];
+
     /* @var $em EntityManager */
     $em = $app['orm.em'];
 
@@ -109,10 +113,27 @@ $app->get('/user/', function (Request $request) use ($app) {
 
     $similarUsers = $userRespository->getUsersWithSimilarLikes($app['user']);
 
+    /* @var $userFollowerRespository \Doctrine\ORM\EntityRepository */
+    $userFollowerRespository = $em->getRepository(UserFollowerEntity::class);
+
+    $userFollowerEntities = $userFollowerRespository->findBy([
+        'follower' => $user,
+    ]);
+    $followedUsers = UserFollowerEntity::unwrapFollowedUsers($userFollowerEntities);
+
+    $similarUsers = array_diff($similarUsers, $followedUsers);
+
+    /* @var $session \Symfony\Component\HttpFoundation\Session\Session */
+    $session = $app['session'];
+    $flashBag = $session->getFlashBag();
+
     return $app->render('user/index.html.twig', [
         'form' => $form->createView(),
         'likedUrls' => $likedUrls,
         'similarUsers' => $similarUsers,
+        'followedUsers' => $followedUsers,
+        'flashMessage' => $flashBag->get('message', [ '' ])[0],
+        'flashMessageType' => $flashBag->get('message-type', [ 'default' ])[0],
     ]);
 })->bind('user');
 
@@ -162,6 +183,107 @@ $app->match('/user/likeUrl', function (Request $request) use ($app) {
         'form' => $form->createView(),
     ]);
 })->bind('likeUrl');
+
+
+$app->match('/user/follow/{username}', function ($username) use ($app) {
+    /* @var $em EntityManager */
+    $em = $app['orm.em'];
+
+    /* @var $user UserEntity */
+    $user = $app['user'];
+
+
+    /* @var $userRespository UserEntityRepository */
+    $userRespository = $em->getRepository(UserEntity::class);
+
+    /* @var $followee UserEntity */
+    $followee = $userRespository->findOneBy(['username' => $username]);
+
+    /* @var $session \Symfony\Component\HttpFoundation\Session\Session */
+    $session = $app['session'];
+    $flashBag = $session->getFlashBag();
+    if (empty($followee))
+    {
+        $flashBag->add('message-type', 'danger');
+        $flashBag->add('message', 'Could not find user ' . $username);
+    }
+    else
+    {
+        /* @var $userFollowerRespository \Doctrine\ORM\EntityRepository */
+        $userFollowerRespository = $em->getRepository(UserFollowerEntity::class);
+        $userFollowerEntity = $userFollowerRespository->findOneBy([
+            'follower' => $user,
+            'followee' => $followee
+        ]);
+
+        if (empty($userFollowerEntity))
+        {
+            $userFollowerEntity = $user->followUser($followee);
+            $em->persist($userFollowerEntity);
+            $em->flush();
+
+            $flashBag->add('message-type', 'success');
+            $flashBag->add('message', 'Now following ' . $username);
+        }
+        else
+        {
+            $flashBag->add('message-type', 'warning');
+            $flashBag->add('message', 'You were already following ' . $username);
+        }
+    }
+
+    return $app->redirect($app->url('user'));
+})->bind('follow-user');
+
+
+$app->match('/user/unfollow/{username}', function ($username) use ($app) {
+    /* @var $em EntityManager */
+    $em = $app['orm.em'];
+
+    /* @var $user UserEntity */
+    $user = $app['user'];
+
+
+    /* @var $userRespository UserEntityRepository */
+    $userRespository = $em->getRepository(UserEntity::class);
+
+    /* @var $followee UserEntity */
+    $followee = $userRespository->findOneBy(['username' => $username]);
+
+    /* @var $session \Symfony\Component\HttpFoundation\Session\Session */
+    $session = $app['session'];
+    $flashBag = $session->getFlashBag();
+    if (empty($followee))
+    {
+        $flashBag->add('message-type', 'danger');
+        $flashBag->add('message', 'Could not find user ' . $username);
+    }
+    else
+    {
+        /* @var $userFollowerRespository \Doctrine\ORM\EntityRepository */
+        $userFollowerRespository = $em->getRepository(UserFollowerEntity::class);
+        $userFollowerEntity = $userFollowerRespository->findOneBy([
+            'follower' => $user,
+            'followee' => $followee
+        ]);
+
+        if (empty($userFollowerEntity))
+        {
+            $flashBag->add('message-type', 'warning');
+            $flashBag->add('message', 'You weren\'t following ' . $username);
+        }
+        else
+        {
+            $em->remove($userFollowerEntity);
+            $em->flush();
+
+            $flashBag->add('message-type', 'success');
+            $flashBag->add('message', 'No longer following ' . $username);
+        }
+    }
+
+    return $app->redirect($app->url('user'));
+})->bind('unfollow-user');
 
 $app->get('/poll/newUrls', function (Request $request) use ($app) {
     /* @var $em EntityManager */

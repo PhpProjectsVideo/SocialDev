@@ -195,6 +195,19 @@ class UserEntity implements UserInterface
     }
 
     /**
+     * Causes $this user to follow the passed $user
+     *
+     * In order to finalize the change you must persist the returned entity.
+     * 
+     * @param UserEntity $user
+     * @return UserFollowerEntity
+     */
+    public function followUser(UserEntity $user) : UserFollowerEntity
+    {
+        return new UserFollowerEntity($this, $user, time());
+    }
+    
+    /**
      * Validations to run for this entity
      * 
      * @param ClassMetadata $metadata

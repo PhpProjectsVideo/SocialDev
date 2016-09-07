@@ -319,6 +319,17 @@ class UserEntity extends \PhpProjects\SocialDev\Model\User\UserEntity implements
     /**
      * {@inheritDoc}
      */
+    public function followUser(\PhpProjects\SocialDev\Model\User\UserEntity $user): \PhpProjects\SocialDev\Model\User\UserFollowerEntity
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'followUser', [$user]);
+
+        return parent::followUser($user);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function __toString()
     {
 

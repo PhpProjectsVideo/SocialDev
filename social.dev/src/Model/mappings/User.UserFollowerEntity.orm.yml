@@ -1,0 +1,24 @@
+PhpProjects\SocialDev\Model\User\UserFollowerEntity:
+  type: entity
+  table: user_follower
+  id:
+    followee:
+      associationKey: true
+    follower:
+      associationKey: true
+  fields:
+    timestamp:
+      type: integer
+      options:
+        unsigned: true
+  manyToOne:
+    followee:
+      targetEntity: PhpProjects\SocialDev\Model\User\UserEntity
+      joinColumn:
+        name: followee_id
+        referencedColumnName: user_id
+    follower:
+      targetEntity: PhpProjects\SocialDev\Model\User\UserEntity
+      joinColumn:
+        name: follower_id
+        referencedColumnName: user_id
