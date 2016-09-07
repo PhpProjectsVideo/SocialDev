@@ -104,9 +104,15 @@ $app->get('/user/', function (Request $request) use ($app) {
     
     $likedUrls = $likeUrlRepo->getRecentLikedUrls($app['user']);
 
+    /* @var $userRespository UserEntityRepository */
+    $userRespository = $em->getRepository(UserEntity::class);
+
+    $similarUsers = $userRespository->getUsersWithSimilarLikes($app['user']);
+
     return $app->render('user/index.html.twig', [
         'form' => $form->createView(),
-        'likedUrls' => $likedUrls
+        'likedUrls' => $likedUrls,
+        'similarUsers' => $similarUsers,
     ]);
 })->bind('user');
 
