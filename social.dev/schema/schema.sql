@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS user;
 
 CREATE TABLE user (
     user_id    INT UNSIGNED AUTO_INCREMENT NOT NULL,
-    google_uid VARCHAR(64)                 NOT NULL,
+    google_uid VARCHAR(64) DEFAULT NULL,
     email      VARCHAR(255)                NOT NULL,
     username   VARCHAR(100)                DEFAULT NULL,
     UNIQUE INDEX UNIQ_8D93D6495E10E8A (google_uid),

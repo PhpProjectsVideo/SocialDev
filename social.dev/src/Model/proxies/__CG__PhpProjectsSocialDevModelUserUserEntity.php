@@ -327,4 +327,15 @@ class UserEntity extends \PhpProjects\SocialDev\Model\User\UserEntity implements
         return parent::__toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function fireNewUserEvent()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'fireNewUserEvent', []);
+
+        return parent::fireNewUserEvent();
+    }
+
 }

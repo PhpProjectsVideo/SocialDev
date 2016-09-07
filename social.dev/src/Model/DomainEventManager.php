@@ -9,6 +9,7 @@ class DomainEventManager
 {
     // Listing of all of our events
     const EVENT_NEWURL = 'onNewUrl';
+    const EVENT_NEWUSER = 'onNewUser';
 
     /**
      * @var DomainEventManager

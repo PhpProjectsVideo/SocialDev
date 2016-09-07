@@ -2,10 +2,13 @@
 
 use Doctrine\ORM\EntityManager;
 use PhpProjects\SocialDev\Application\SocialApplication;
-use PhpProjects\SocialDev\Model\Url\HttpUrlService;
+use PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntity;
+use PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntityRepository;
 use PhpProjects\SocialDev\Model\Url\UrlEntity;
 use PhpProjects\SocialDev\Model\Url\UrlEntityRepository;
 use PhpProjects\SocialDev\Model\User\UserEntity;
+use PhpProjects\SocialDev\Model\User\UserEntityRepository;
+use PhpProjects\SocialDev\Search\UserIndexingService;
 use PhpProjects\SocialDev\UI\FormTypes\RegistrationFormType;
 use PhpProjects\SocialDev\UI\FormTypes\UrlFormType;
 use Silex\Application;
@@ -96,8 +99,8 @@ $app->get('/user/', function (Request $request) use ($app) {
     /* @var $em EntityManager */
     $em = $app['orm.em'];
 
-    /* @var $likeUrlRepo \PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntityRepository */
-    $likeUrlRepo = $em->getRepository(\PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntity::class);
+    /* @var $likeUrlRepo LikedUrlEntityRepository */
+    $likeUrlRepo = $em->getRepository(LikedUrlEntity::class);
     
     $likedUrls = $likeUrlRepo->getRecentLikedUrls($app['user']);
 
@@ -197,6 +200,62 @@ $app->get('/poll/newUrls', function (Request $request) use ($app) {
 
     return $app->json([ 'urls' => [] ]);
 });
+
+$app->get('/search/user', function (Request $request) use ($app) {
+    $username = $request->get('username', false);
+
+    $users = [];
+    $error = '';
+    if ($username !== false)
+    {
+        if (strlen($username) > 0)
+        {
+            /* @var $em EntityManager */
+            $em = $app['orm.em'];
+
+            /* @var $userRespository UserEntityRepository */
+            $userRespository = $em->getRepository(UserEntity::class);
+
+            /* @var $userIndexingService UserIndexingService */
+            $userIndexingService = $app['elasticSearch.userIndexingService'];
+
+            $users = $userRespository->getUsersFromSearch($username, $userIndexingService);
+        }
+        else
+        {
+            $error = 'You must specify a user name';
+        }
+    }
+
+    return $app->renderView('search.html.twig', [
+        'users' => $users,
+        'error' => $error
+    ]);
+})->bind('searchUser');
+
+$app->get('/search/user/{username}', function (string $username, Request $request) use ($app) {
+    /* @var $em EntityManager */
+    $em = $app['orm.em'];
+
+    /* @var $userRespository UserEntityRepository */
+    $userRespository = $em->getRepository(UserEntity::class);
+    
+    /* @var $userEntity UserEntity */
+    $userEntity = $userRespository->findOneBy(['username' => $username]);
+    if (empty($userEntity))
+    {
+        throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
+    }
+    
+    /* @var $likedUrlRepository LikedUrlEntityRepository */
+    $likedUrlRepository = $em->getRepository(LikedUrlEntity::class);
+    $likedUrls = $likedUrlRepository->getRecentLikedUrls($userEntity);
+    
+    return $app->renderView('userResult.html.twig', [
+        'user' => $userEntity,
+        'urls' => $likedUrls,
+    ]);
+})->bind('public-user');
 
 $app->match('/logout', function () {})->bind('logout');
 //endregion

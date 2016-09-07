@@ -9,6 +9,7 @@ use PhpProjects\SocialDev\Model\Url\UrlServiceProvider;
 use PhpProjects\SocialDev\Model\User\SocialDevUserProvider;
 use PhpProjects\SocialDev\Model\User\UserEntity;
 use PhpProjects\SocialDev\Pheanstalk\PheanstalkProvider;
+use PhpProjects\SocialDev\Search\ElasticSearchServiceProvider;
 use Saxulum\DoctrineOrmManagerRegistry\Provider\DoctrineOrmManagerRegistryProvider;
 use Silex\Application;
 use Silex\Provider\CsrfServiceProvider;
@@ -150,6 +151,8 @@ class SocialApplication extends Application
                 'port' => PHEANSTALK_PORT,
             ],
         ]);
+        
+        $this->register(new ElasticSearchServiceProvider());
     }
 
     /**

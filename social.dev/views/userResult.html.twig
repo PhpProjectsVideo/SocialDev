@@ -1,0 +1,27 @@
+{% extends '/base.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1>{{ user.username }} - Recent Urls</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div id="url-list" class="row">
+            {% for linkedUrl in urls %}
+                <div class="col-md-3">
+                    <div class="thumbnail">
+                        <a href="{{ linkedUrl.url.url }}">
+                            <img src="{{ linkedUrl.url.imageUrl }}">
+                        </a>
+                        <div class="caption">
+                            <h5><a href="{{ linkedUrl.url.url }}" class="truncate-one-line">{{ linkedUrl.url.title }}</a>
+                                <span class="truncate-one-line">{{ linkedUrl.url.user.username|default('Anonymous') }} @ {{ linkedUrl.url.timestamp|date('F j, Y @ g:i a') }}</span></h5>
+                            <p class="truncate-four-lines">{{ linkedUrl.url.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

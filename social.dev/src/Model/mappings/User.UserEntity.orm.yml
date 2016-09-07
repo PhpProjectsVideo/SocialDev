@@ -1,5 +1,6 @@
 PhpProjects\SocialDev\Model\User\UserEntity:
   type: entity
+  repositoryClass: PhpProjects\SocialDev\Model\User\UserEntityRepository
   table: user
   id:
     user_id:
@@ -12,7 +13,7 @@ PhpProjects\SocialDev\Model\User\UserEntity:
     googleUid:
       type: string
       length: 64
-      nullable: false
+      nullable: true
       column: google_uid
       unique: true
     email:
@@ -25,3 +26,5 @@ PhpProjects\SocialDev\Model\User\UserEntity:
       length: 100
       nullable: false
       unique: true
+  lifecycleCallbacks:
+      postPersist: [ fireNewUserEvent ]

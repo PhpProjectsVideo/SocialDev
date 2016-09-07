@@ -1,6 +1,7 @@
 <?php
 
 namespace PhpProjects\SocialDev\Model\User;
+use PhpProjects\SocialDev\Model\DomainEventManager;
 use PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntity;
 use PhpProjects\SocialDev\Model\Url\UrlEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -214,6 +215,14 @@ class UserEntity implements UserInterface
     public function __toString()
     {
         return $this->getUsername() ?? '';
+    }
+
+    /**
+     * fires a domain event indicating that a new user has been persisted
+     */
+    public function fireNewUserEvent()
+    {
+        DomainEventManager::getInstance()->dispatchEvent(DomainEventManager::EVENT_NEWUSER, [ 'user' => $this ]);
     }
 }
 
