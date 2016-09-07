@@ -1,0 +1,44 @@
+PhpProjects\SocialDev\Model\Feed\FeedItemEntity:
+  type: entity
+  repositoryClass: PhpProjects\SocialDev\Model\Feed\FeedItemEntityRepository
+  table: feed_item
+  id:
+    feedItemId:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    description:
+      type: string
+      length: 1024
+      nullable: false
+    imageUrl:
+      type: string
+      length: 1024
+      nullable: true
+    detailUrl:
+      type: string
+      length: 1024
+      nullable: false
+    timestamp:
+      type: integer
+      options:
+        unsigned: true
+  manyToOne:
+    user:
+      targetEntity: PhpProjects\SocialDev\Model\User\UserEntity
+      joinColumn:
+        name: user_id
+        referencedColumnName: user_id
+    author:
+      targetEntity: PhpProjects\SocialDev\Model\User\UserEntity
+      joinColumn:
+        name: author_id
+        referencedColumnName: user_id
+    url:
+      targetEntity: PhpProjects\SocialDev\Model\Url\UrlEntity
+      joinColumn:
+        name: url_id
+        referencedColumnName: url_id

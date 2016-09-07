@@ -54,7 +54,30 @@ class UserFollowerEntity
                 throw new \InvalidArgumentException("All objects must be UserFollowerEntities");
             }
         }
-        
+
+        return $users;
+    }
+
+    /**
+     * Unwraps the users following from a list of user followers
+     * @param array $userFollowerEntities
+     * @return array
+     */
+    public static function unwrapFollowingUsers(array $userFollowerEntities) : array
+    {
+        $users = [];
+        foreach ($userFollowerEntities as $userFollower)
+        {
+            if ($userFollower instanceof self)
+            {
+                $users[$userFollower->follower->getUserId()] = $userFollower->follower;
+            }
+            else
+            {
+                throw new \InvalidArgumentException("All objects must be UserFollowerEntities");
+            }
+        }
+
         return $users;
     }
 

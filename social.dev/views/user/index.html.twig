@@ -19,6 +19,31 @@
                 {{ form_widget(form) }}
                 <button type="submit" class="btn btn-default">Like Url</button>
             </form>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Your Feed</h3>
+                </div>
+                <ul class="list-group" id="feed-list" data-timestamp="{{ feed[0].timestamp|default(0) }}">
+                    {% for item in feed %}
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    {% if item.imageUrl %}
+                                        <a href="{{ item.generateUrl(app) }}">
+                                            <img src="{{ item.imageUrl }}" style="width: 100%">
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-10">
+                                    <h5>{{ item.timestamp|date('F j, Y @ g:i a') }}</h5>
+                                    <p><a href="{{ item.generateUrl(app) }}">{{ item.description|raw }}</a></p>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
         </div>
         <div class="col-md-6">
             {% if followedUsers|length %}
@@ -73,4 +98,62 @@
             {% endif %}
         </div>
     </div>
+    <ul style="display: none" id="feed-list-template">
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col-md-2">
+                    <a data-feed-detailurl data-feed-imagecontainer>
+                        <img data-feed-imageurl style="width: 100%">
+                    </a>
+                </div>
+                <div class="col-md-10">
+                    <h5 data-feed-timestamp></h5>
+                    <p><a data-feed-detailurl data-feed-description></a></p>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <script>
+        (function poll(){
+            setTimeout(function(){
+                $.ajax({
+                    url: "/user/poll/feed",
+                    data: {
+                        timestamp: $('#feed-list').data('timestamp')
+                    },
+                    success: function(data){
+                        var addBefore = $('#feed-list').children(':first');
+
+                        if (data.feed.length > 0)
+                        {
+                            $('#feed-list').data('timestamp', data.feed[0].timestamp);
+                        }
+                        $.each(data.feed, function (k, item) {
+                            var container = $("#feed-list-template").children(':first').clone();
+
+                            container.find("[data-feed-detailurl]").attr('href', item.url);
+                            if (item.imageUrl)
+                            {
+                                container.find("[data-feed-imageurl]").attr('src', item.imageUrl);
+                            }
+                            else
+                            {
+                                container.find("[data-feed-imagecontainer]").remove();
+                            }
+                            container.find("[data-feed-timestamp]").text(item.date);
+                            container.find("[data-feed-description]").html(item.description);
+
+                            addBefore.before(container);
+                        });
+                        //Setup the next poll recursively
+                        poll();
+                    },
+                    error: function () {
+                        poll();
+                    },
+                    dataType: "json"
+                });
+            }, 1000);
+        })();
+    </script>
 {% endblock %}

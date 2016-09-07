@@ -2,6 +2,7 @@
 
 namespace PhpProjects\SocialDev\Model\Url;
 
+use PhpProjects\SocialDev\Model\DomainEventManager;
 use PhpProjects\SocialDev\Model\User\UserEntity;
 
 /**
@@ -86,5 +87,13 @@ class UrlCommentEntity
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * Notify the domain of a new comment
+     */
+    public function fireNewCommentEvent()
+    {
+        DomainEventManager::getInstance()->dispatchEvent(DomainEventManager::EVENT_NEWCOMMENT, [ 'urlComment' => $this ]);
     }
 }

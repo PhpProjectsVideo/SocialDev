@@ -7,6 +7,7 @@ CREATE TABLE `session` (
     `session_lifetime` MEDIUMINT NOT NULL
 ) COLLATE utf8_bin, ENGINE = InnoDB;
 
+DROP TABLE IF EXISTS feed_item;
 DROP TABLE IF EXISTS url_comment;
 DROP TABLE IF EXISTS user_follower;
 DROP TABLE IF EXISTS user_url;
@@ -105,3 +106,30 @@ ALTER TABLE url_comment
 
 ALTER TABLE url_comment
     ADD CONSTRAINT FK_2907043081CFDAE7 FOREIGN KEY (url_id) REFERENCES url (url_id);
+
+CREATE TABLE feed_item (
+    user_id     INT UNSIGNED  DEFAULT NULL,
+    author_id   INT UNSIGNED  DEFAULT NULL,
+    url_id      VARCHAR(64)   DEFAULT NULL,
+    feedItemId  INT UNSIGNED AUTO_INCREMENT NOT NULL,
+    description VARCHAR(1024)               NOT NULL,
+    imageUrl    VARCHAR(1024) DEFAULT NULL,
+    detailUrl   VARCHAR(1024)               NOT NULL,
+    timestamp   INT UNSIGNED                NOT NULL,
+    INDEX IDX_9F8CCE49A76ED395 (user_id),
+    INDEX IDX_9F8CCE49F675F31B (author_id),
+    INDEX IDX_9F8CCE4981CFDAE7 (url_id),
+    PRIMARY KEY (feedItemId)
+)
+    DEFAULT CHARACTER SET utf8
+    COLLATE utf8_unicode_ci
+    ENGINE = InnoDB;
+
+ALTER TABLE feed_item
+    ADD CONSTRAINT FK_9F8CCE49A76ED395 FOREIGN KEY (user_id) REFERENCES user (user_id);
+
+ALTER TABLE feed_item
+    ADD CONSTRAINT FK_9F8CCE49F675F31B FOREIGN KEY (author_id) REFERENCES user (user_id);
+
+ALTER TABLE feed_item
+    ADD CONSTRAINT FK_9F8CCE4981CFDAE7 FOREIGN KEY (url_id) REFERENCES url (url_id);

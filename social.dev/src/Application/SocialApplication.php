@@ -5,6 +5,7 @@ namespace PhpProjects\SocialDev\Application;
 use Dflydev\Provider\DoctrineOrm\DoctrineOrmServiceProvider;
 use Gigablah\Silex\OAuth\OAuthServiceProvider;
 use Pheanstalk\Pheanstalk;
+use PhpProjects\SocialDev\Model\Feed\FeedItemServiceProvider;
 use PhpProjects\SocialDev\Model\Url\UrlServiceProvider;
 use PhpProjects\SocialDev\Model\User\SocialDevUserProvider;
 use PhpProjects\SocialDev\Model\User\UserEntity;
@@ -156,6 +157,8 @@ class SocialApplication extends Application
         $this->register(new ElasticSearchServiceProvider());
 
         $this->register(new HttpFragmentServiceProvider());
+
+        $this->register(new FeedItemServiceProvider());
     }
 
     /**

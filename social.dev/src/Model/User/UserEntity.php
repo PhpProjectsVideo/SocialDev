@@ -2,7 +2,9 @@
 
 namespace PhpProjects\SocialDev\Model\User;
 use PhpProjects\SocialDev\Model\DomainEventManager;
+use PhpProjects\SocialDev\Model\Feed\FeedItemEntity;
 use PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntity;
+use PhpProjects\SocialDev\Model\Url\UrlCommentEntity;
 use PhpProjects\SocialDev\Model\Url\UrlEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -206,7 +208,106 @@ class UserEntity implements UserInterface
     {
         return new UserFollowerEntity($this, $user, time());
     }
-    
+
+    /**
+     * Returns a new feed item entity for a followed user liking a url
+     *
+     * @param LikedUrlEntity $likedUrl
+     * @return FeedItemEntity
+     */
+    public function addFollowedUserLikedUrlToFeed(LikedUrlEntity $likedUrl)
+    {
+        $feedItemEntity = new FeedItemEntity(
+            $this,
+            $likedUrl->getUser(),
+            $likedUrl->getUrl(),
+            'Followed user {{author}} has liked {{url}}',
+            'url-details?urlId=' . $likedUrl->getUrl()->getUrlId(),
+            time()
+        );
+        if ($likedUrl->getUrl()->getImageUrl())
+        {
+            $feedItemEntity->setImageUrl($likedUrl->getUrl()->getImageUrl());
+        }
+        return $feedItemEntity;
+    }
+
+    /**
+     * Returns a new feed item entity for a followed user commenting on a url
+     *
+     * @param UrlCommentEntity $commentEntity
+     * @return FeedItemEntity
+     */
+    public function addFollowedUserCommentToFeed(UrlCommentEntity $commentEntity)
+    {
+        $followedUser = $commentEntity->getAuthor();
+        $url = $commentEntity->getUrl();
+        $feedItemEntity = new FeedItemEntity(
+            $this,
+            $followedUser,
+            $url,
+            'Followed user {{author}} has commented on {{url}}',
+            'url-details?urlId=' . $url->getUrlId(),
+            time()
+        );
+        if ($url->getImageUrl())
+        {
+            $feedItemEntity->setImageUrl($url->getImageUrl());
+        }
+        return $feedItemEntity;
+    }
+
+    /**
+     * Returns a new feed item entity for a user commenting on your url
+     *
+     * @param UrlCommentEntity $commentEntity
+     * @return FeedItemEntity
+     */
+    public function addUserCommentedOnSharedUrlToFeed(UrlCommentEntity $commentEntity)
+    {
+        $user = $commentEntity->getAuthor();
+        $sharedUrl = $commentEntity->getUrl();
+        $feedItemEntity = new FeedItemEntity(
+            $this,
+            $user,
+            $sharedUrl,
+            'Unfollowed user {{author}} has commented on your {{url}}',
+            'url-details?urlId=' . $sharedUrl->getUrlId(),
+            time()
+        );
+        if ($sharedUrl->getImageUrl())
+        {
+            $feedItemEntity->setImageUrl($sharedUrl->getImageUrl());
+        }
+        return $feedItemEntity;
+    }
+
+    /**
+     * Returns a new feed item entity for a user sharing a url you have already shared
+     *
+     * @param LikedUrlEntity $likedUrl
+     * @return FeedItemEntity
+     */
+    public function addUserSharingSameUrl(LikedUrlEntity $likedUrl)
+    {
+        $user = $likedUrl->getUser();
+        $sharedUrl = $likedUrl->getUrl();
+        
+        $feedItemEntity = new FeedItemEntity(
+            $this,
+            $user,
+            $sharedUrl,
+            'Unfollowed user {{author}} has shared {{url}}',
+            'url-details?urlId=' . $sharedUrl->getUrlId(),
+            time()
+        );
+        if ($sharedUrl->getImageUrl())
+        {
+            $feedItemEntity->setImageUrl($sharedUrl->getImageUrl());
+        }
+        return $feedItemEntity;
+    }
+
     /**
      * Validations to run for this entity
      * 

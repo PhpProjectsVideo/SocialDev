@@ -2,6 +2,7 @@
 
 namespace PhpProjects\SocialDev\Model\LikedUrl;
 
+use PhpProjects\SocialDev\Model\DomainEventManager;
 use PhpProjects\SocialDev\Model\Url\UrlEntity;
 use PhpProjects\SocialDev\Model\User\UserEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -41,6 +42,30 @@ class LikedUrlEntity
     }
 
     /**
+     * Unwraps the users from a list of LikedUrlEntities
+     *
+     * @param array $likedUrls
+     * @return array
+     */
+    public static function unwrapLikingUsers(array $likedUrls)
+    {
+        $users = [];
+        foreach ($likedUrls as $urlLiker)
+        {
+            if ($urlLiker instanceof self)
+            {
+                $users[$urlLiker->getUser()->getUserId()] = $urlLiker->getUser();
+            }
+            else
+            {
+                throw new \InvalidArgumentException("All objects must be LikedUrlEntities");
+            }
+        }
+
+        return $users;
+    }
+
+    /**
      * @return UserEntity
      */
     public function getUser() : UserEntity
@@ -75,5 +100,13 @@ class LikedUrlEntity
             'fields'  => ['user', 'url'],
             'message' => 'You have already liked this url.',
         )));
+    }
+
+    /**
+     * Notify the domain of a new liked url
+     */
+    public function fireNewLikedUrlEvent()
+    {
+        DomainEventManager::getInstance()->dispatchEvent(DomainEventManager::EVENT_LIKEDURL, [ 'likedUrl' => $this ]);
     }
 }

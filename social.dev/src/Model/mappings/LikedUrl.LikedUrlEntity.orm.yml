@@ -26,3 +26,5 @@ PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntity:
   uniqueConstraints:
     user_url:
       columns: [ url_id, user_id ]
+  lifecycleCallbacks:
+      postPersist: [ fireNewLikedUrlEvent ]

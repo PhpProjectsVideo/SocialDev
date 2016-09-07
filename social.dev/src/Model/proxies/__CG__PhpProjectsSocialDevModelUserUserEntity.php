@@ -330,6 +330,50 @@ class UserEntity extends \PhpProjects\SocialDev\Model\User\UserEntity implements
     /**
      * {@inheritDoc}
      */
+    public function addFollowedUserLikedUrlToFeed(\PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntity $likedUrl)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addFollowedUserLikedUrlToFeed', [$likedUrl]);
+
+        return parent::addFollowedUserLikedUrlToFeed($likedUrl);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addFollowedUserCommentToFeed(\PhpProjects\SocialDev\Model\Url\UrlCommentEntity $commentEntity)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addFollowedUserCommentToFeed', [$commentEntity]);
+
+        return parent::addFollowedUserCommentToFeed($commentEntity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addUserCommentedOnSharedUrlToFeed(\PhpProjects\SocialDev\Model\Url\UrlCommentEntity $commentEntity)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addUserCommentedOnSharedUrlToFeed', [$commentEntity]);
+
+        return parent::addUserCommentedOnSharedUrlToFeed($commentEntity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addUserSharingSameUrl(\PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntity $likedUrl)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addUserSharingSameUrl', [$likedUrl]);
+
+        return parent::addUserSharingSameUrl($likedUrl);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function __toString()
     {
 

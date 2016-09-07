@@ -2,6 +2,8 @@
 
 use Doctrine\ORM\EntityManager;
 use PhpProjects\SocialDev\Application\SocialApplication;
+use PhpProjects\SocialDev\Model\Feed\FeedItemEntity;
+use PhpProjects\SocialDev\Model\Feed\FeedItemEntityRepository;
 use PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntity;
 use PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntityRepository;
 use PhpProjects\SocialDev\Model\Url\UrlCommentEntity;
@@ -126,6 +128,10 @@ $app->get('/user/', function (Request $request) use ($app) {
 
     $similarUsers = array_diff($similarUsers, $followedUsers);
 
+    /* @var $feedRepository FeedItemEntityRepository */
+    $feedRepository = $em->getRepository(FeedItemEntity::class);
+    $feed = $feedRepository->getRecentFeedItemsForUser($user);
+
     /* @var $session \Symfony\Component\HttpFoundation\Session\Session */
     $session = $app['session'];
     $flashBag = $session->getFlashBag();
@@ -135,6 +141,7 @@ $app->get('/user/', function (Request $request) use ($app) {
         'likedUrls' => $likedUrls,
         'similarUsers' => $similarUsers,
         'followedUsers' => $followedUsers,
+        'feed' => $feed,
         'flashMessage' => $flashBag->get('message', [ '' ])[0],
         'flashMessageType' => $flashBag->get('message-type', [ 'default' ])[0],
     ]);
@@ -529,6 +536,51 @@ $app->get('/poll/comments/{urlId}', function ($urlId, Request $request) use ($ap
 
     return $app->json([ 'comments' => [] ]);
 })->bind('poll-comments');
+
+$app->get('/user/poll/feed', function (Request $request) use ($app) {
+    /* @var $user UserEntity */
+    $user = $app['user'];
+
+    /* @var $em EntityManager */
+    $em = $app['orm.em'];
+    $timestamp = $request->get('timestamp') ?? 0;
+
+    /* @var $feedRepository FeedItemEntityRepository */
+    $feedRepository = $em->getRepository(FeedItemEntity::class);
+ 
+    $startTime = time();
+
+    //before we enter our loop we should let our session expire
+    /* @var $session \Symfony\Component\HttpFoundation\Session\Session */
+    $session = $app['session'];
+    $session->save();
+    while (time() < $startTime + 10)
+    {
+        $feed = [];
+        /* @var $feedItem FeedItemEntity */
+        foreach ($feedRepository->getRecentFeedItemsForUser($user, $timestamp) as $feedItem)
+        {
+            $feed[] = [
+                'description' => $feedItem->getDescription(),
+                'url' => $feedItem->generateUrl($app),
+                'imageUrl' => $feedItem->getImageUrl(),
+                'timestamp' => $feedItem->getTimestamp(),
+                'date' => date('F j, Y @ g:i a', $feedItem->getTimestamp()),
+            ];
+        }
+
+        if (count($feed))
+        {
+            return $app->json([
+                'feed' => $feed,
+            ]);
+        }
+
+        sleep(1);
+    }
+
+    return $app->json([ 'feed' => [] ]);
+})->bind('poll-feed');
 
 
 $app->match('/logout', function () {})->bind('logout');

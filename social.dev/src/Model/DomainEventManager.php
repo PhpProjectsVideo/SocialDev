@@ -10,6 +10,8 @@ class DomainEventManager
     // Listing of all of our events
     const EVENT_NEWURL = 'onNewUrl';
     const EVENT_NEWUSER = 'onNewUser';
+    const EVENT_LIKEDURL = 'onLikedUrl';
+    const EVENT_NEWCOMMENT = 'onNewComment';
 
     /**
      * @var DomainEventManager

@@ -31,3 +31,5 @@ PhpProjects\SocialDev\Model\Url\UrlCommentEntity:
   indexes:
     url_timestamp_idx:
       columns: [ url_id, timestamp ]
+  lifecycleCallbacks:
+      postPersist: [ fireNewCommentEvent ]
