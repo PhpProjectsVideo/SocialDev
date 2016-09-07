@@ -1,0 +1,18 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Comments</h3>
+    </div>
+    <ul class="list-group" id="comment-list" data-lastcomment="{{ comments|last.urlCommentId|default(0) }}">
+        {% for comment in comments %}
+            <li class="list-group-item">
+                <h5>{{ comment.author.username }}<br>
+                    <small>{{ comment.timestamp|date('F j, Y @ g:i a') }}</small></h5>
+                <p>{{ comment.comment|nl2br }}</p>
+            </li>
+        {% else %}
+            <li class="list-group-item" id="empty-comment">
+                <p>No comments yet</p>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

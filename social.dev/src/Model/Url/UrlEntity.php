@@ -184,6 +184,18 @@ class UrlEntity
     }
 
     /**
+     * Adds a comment to $this url and returns the resulting entity for further persisting.
+     * 
+     * @param UserEntity $author
+     * @param $comment
+     * @return UrlCommentEntity
+     */
+    public function addComment(UserEntity $author, $comment) : UrlCommentEntity
+    {
+        return new UrlCommentEntity($this, $author, $comment, time());
+    }
+
+    /**
      * @return int
      */
     public function getTimestamp() : int

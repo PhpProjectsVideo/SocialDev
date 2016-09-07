@@ -1,0 +1,33 @@
+PhpProjects\SocialDev\Model\Url\UrlCommentEntity:
+  type: entity
+  repositoryClass: PhpProjects\SocialDev\Model\Url\UrlCommentEntityRepository
+  table: url_comment
+  id:
+    urlCommentId:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    comment:
+      type: text
+      nullable: true
+    timestamp:
+      type: integer
+      options:
+        unsigned: true
+  manyToOne:
+    author:
+      targetEntity: PhpProjects\SocialDev\Model\User\UserEntity
+      joinColumn:
+        name: user_id
+        referencedColumnName: user_id
+    url:
+      targetEntity: PhpProjects\SocialDev\Model\Url\UrlEntity
+      joinColumn:
+        name: url_id
+        referencedColumnName: url_id
+  indexes:
+    url_timestamp_idx:
+      columns: [ url_id, timestamp ]

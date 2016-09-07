@@ -7,6 +7,7 @@ CREATE TABLE `session` (
     `session_lifetime` MEDIUMINT NOT NULL
 ) COLLATE utf8_bin, ENGINE = InnoDB;
 
+DROP TABLE IF EXISTS url_comment;
 DROP TABLE IF EXISTS user_follower;
 DROP TABLE IF EXISTS user_url;
 DROP TABLE IF EXISTS url;
@@ -84,3 +85,23 @@ ALTER TABLE user_follower
 ALTER TABLE user_follower
     ADD CONSTRAINT FK_595BED46AC24F853 FOREIGN KEY (follower_id) REFERENCES user (user_id);
 
+CREATE TABLE url_comment (
+    user_id      INT UNSIGNED DEFAULT NULL,
+    url_id       VARCHAR(64)  DEFAULT NULL,
+    urlCommentId INT UNSIGNED AUTO_INCREMENT NOT NULL,
+    comment      LONGTEXT     DEFAULT NULL,
+    timestamp    INT UNSIGNED                NOT NULL,
+    INDEX IDX_29070430A76ED395 (user_id),
+    INDEX IDX_2907043081CFDAE7 (url_id),
+    INDEX url_timestamp_idx (url_id, timestamp),
+    PRIMARY KEY (urlCommentId)
+)
+    DEFAULT CHARACTER SET utf8
+    COLLATE utf8_unicode_ci
+    ENGINE = InnoDB;
+
+ALTER TABLE url_comment
+    ADD CONSTRAINT FK_29070430A76ED395 FOREIGN KEY (user_id) REFERENCES user (user_id);
+
+ALTER TABLE url_comment
+    ADD CONSTRAINT FK_2907043081CFDAE7 FOREIGN KEY (url_id) REFERENCES url (url_id);

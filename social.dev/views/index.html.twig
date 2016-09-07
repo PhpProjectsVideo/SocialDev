@@ -33,11 +33,11 @@
             {% for url in urls %}
                 <div class="col-md-3">
                     <div class="thumbnail">
-                        <a href="{{ url.url }}">
+                        <a href="{{ app.url('url-details', { 'urlId' : url.urlId }) }}">
                             <img src="{{ url.imageUrl }}">
                         </a>
                         <div class="caption">
-                            <h5><a href="{{ url.url }}" class="truncate-one-line">{{ url.title }}</a>
+                            <h5><a href="{{ app.url('url-details', { 'urlId' : url.urlId }) }}" class="truncate-one-line">{{ url.title }}</a>
                             <span class="truncate-one-line">{{ url.user.username|default('Anonymous') }} @ {{ url.timestamp|date('F j, Y @ g:i a') }}</span></h5>
                             <p class="truncate-four-lines">{{ url.description }}</p>
                         </div>
@@ -78,7 +78,7 @@
                         $.each(data.urls, function (k, url) {
                             var container = $("#url-template").children(':first').clone();
 
-                            container.find("[data-url-url]").attr('href', url.url);
+                            container.find("[data-url-url]").attr('href', '/url/' + url.urlId + '/');
                             container.find("[data-url-thumbnail]").attr('src', url.imageUrl);
                             container.find("[data-url-title]").text(url.title);
                             container.find("[data-url-user]").text(url.username);

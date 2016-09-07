@@ -334,6 +334,17 @@ class UrlEntity extends \PhpProjects\SocialDev\Model\Url\UrlEntity implements \D
     /**
      * {@inheritDoc}
      */
+    public function addComment(\PhpProjects\SocialDev\Model\User\UserEntity $author, $comment): \PhpProjects\SocialDev\Model\Url\UrlCommentEntity
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addComment', [$author, $comment]);
+
+        return parent::addComment($author, $comment);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getTimestamp(): int
     {
 

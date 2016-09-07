@@ -71,7 +71,7 @@ switch ($operation)
             echo "User {$_SERVER['argv'][2]} does not exist\n";
             break;
         }
-        
+
         $urlEntity = $urlRepository->getOneByUrl($_SERVER['argv'][3]);
         if (empty($urlEntity))
         {
@@ -79,12 +79,42 @@ switch ($operation)
             $urlEntity->setUser($userEntity);
             $em->persist($urlEntity);
         }
-        
+
         $linkedUrl = $userEntity->likeUrl($urlEntity);
         $em->persist($linkedUrl);
-        
+
         $em->flush();
         echo "Url Liked!\n";
+        exit(0);
+
+    case 'comment':
+        if ($_SERVER['argc'] < 5)
+        {
+            echo "Need more parameters\n";
+            break;
+        }
+
+        /* @var $userEntity UserEntity */
+        $userEntity = $userRepository->findOneBy(['username' => $_SERVER['argv'][2]]);
+        if (empty($userEntity))
+        {
+            echo "User {$_SERVER['argv'][2]} does not exist\n";
+            break;
+        }
+
+        $urlEntity = $urlRepository->getOneByUrl($_SERVER['argv'][3]);
+        if (empty($urlEntity))
+        {
+            echo "Url {$_SERVER['argv'][3]} does not exist\n";
+            break;
+        }
+
+        $urlComment = $urlEntity->addComment($userEntity, $_SERVER['argv'][4]);
+        $em->persist($urlComment);
+
+
+        $em->flush();
+        echo "Url Commented on!\n";
         exit(0);
 }
 
@@ -93,5 +123,7 @@ echo "Usages:\n"
     . "    php bin/userUtility.php create-user <username> <email address>\n"
     . "  Add a Url to a User -\n"
     . "    php bin/userUtility.php like-url <username> <url>\n"
+    . "  Add a comment to a url for a User -\n"
+    . "    php bin/userUtility.php comment <username> <url> <comment>\n"
 ;
 exit(1);

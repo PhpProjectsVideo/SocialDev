@@ -15,6 +15,7 @@ use Silex\Application;
 use Silex\Provider\CsrfServiceProvider;
 use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\FormServiceProvider;
+use Silex\Provider\HttpFragmentServiceProvider;
 use Silex\Provider\SecurityServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TranslationServiceProvider;
@@ -153,6 +154,8 @@ class SocialApplication extends Application
         ]);
         
         $this->register(new ElasticSearchServiceProvider());
+
+        $this->register(new HttpFragmentServiceProvider());
     }
 
     /**

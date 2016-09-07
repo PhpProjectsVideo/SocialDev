@@ -1,0 +1,94 @@
+{% extends '/base.html.twig' %}
+
+{% block body %}
+    {% if flashMessage %}
+        <div class="alert alert-{{ flashMessageType }} alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>{{ flashMessageType|upper }}!</strong> {{ flashMessage }}.
+        </div>
+    {% endif %}
+    <div class="row">
+        <div class="col-md-3">
+            <div class="thumbnail">
+                <a href="{{ url.url }}">
+                    <img src="{{ url.imageUrl }}">
+                </a>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <h1>
+                <a href="{{ url.url }}">{{ url.title }}</a><br>
+                <small>First shared by {{ url.user.username }} on {{ url.timestamp|date('F j, Y @ g:i a') }}</small>
+            </h1>
+            <p>
+                {{ url.description }}
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        {% if app.user %}
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Add Comment</h3>
+                </div>
+                <form class="panel-body" method="post" action="{{ app.url('url-comment', { 'urlId' : url.urlId }) }}">
+                    <div class="form-group">
+                        <textarea class="form-control" placeholder="Enter Comment Here" name="comment"></textarea>
+                    </div>
+                    <button class="btn btn-default btn-primary">Add Comment</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+        <div class="col-md-6">
+            {{ render(app.url('url-commentList', { 'urlId' : url.urlId})) }}
+        </div>
+    </div>
+    <ul style="display: none" id="comment-template">
+        <li class="list-group-item">
+            <h5><span data-comment-username></span><br>
+                <small data-comment-timestamp></small></h5>
+            <p data-comment-comment></p>
+        </li>
+
+    </ul>
+    <script>
+        (function poll(){
+            setTimeout(function(){
+                console.log($('#comment-list').data('lastcomment'));
+                $.ajax({
+                    url: "/poll/comments/{{ url.urlId }}",
+                    data: {
+                        lastComment: $('#comment-list').data('lastcomment')
+                    },
+                    success: function(data){
+                        var appendTo = $('#comment-list');
+
+                        if (data.comments.length > 0)
+                        {
+                            $('#empty-comment').remove();
+                        }
+                        $.each(data.comments, function (k, comment) {
+                            $('#comment-list').data('lastcomment', comment.commentId);
+
+                            var container = $("#comment-template").children(':first').clone();
+
+                            container.find("[data-comment-username]").text(comment.username);
+                            container.find("[data-comment-timestamp]").text(comment.timestamp);
+                            container.find("[data-comment-comment]").text(comment.comment);
+
+                            appendTo.append(container);
+                        });
+                        //Setup the next poll recursively
+                        poll();
+                    },
+                    error: function () {
+                        poll();
+                    },
+                    dataType: "json"
+                });
+            }, 1000);
+        })();
+    </script>
+{% endblock %}

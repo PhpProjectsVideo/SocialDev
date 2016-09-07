@@ -63,7 +63,7 @@
                     <ul class="list-group">
                         {% for likedUrl in likedUrls %}
                             <li class="list-group-item">
-                                <h4><a href="{{ likedUrl.url.url }}">{{ likedUrl.url.title }}</a>
+                                <h4><a href="{{ app.url('url-details', { 'urlId' : likedUrl.url.urlId }) }}">{{ likedUrl.url.title }}</a>
                                     <span class="small">{{ likedUrl.timestamp|date('F j, Y @ g:i a') }}</span></h4>
                                 <p>{{ likedUrl.url.description }}</p>
                             </li>

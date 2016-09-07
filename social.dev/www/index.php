@@ -4,6 +4,8 @@ use Doctrine\ORM\EntityManager;
 use PhpProjects\SocialDev\Application\SocialApplication;
 use PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntity;
 use PhpProjects\SocialDev\Model\LikedUrl\LikedUrlEntityRepository;
+use PhpProjects\SocialDev\Model\Url\UrlCommentEntity;
+use PhpProjects\SocialDev\Model\Url\UrlCommentEntityRepository;
 use PhpProjects\SocialDev\Model\Url\UrlEntity;
 use PhpProjects\SocialDev\Model\Url\UrlEntityRepository;
 use PhpProjects\SocialDev\Model\User\UserEntity;
@@ -14,6 +16,7 @@ use PhpProjects\SocialDev\UI\FormTypes\RegistrationFormType;
 use PhpProjects\SocialDev\UI\FormTypes\UrlFormType;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -307,6 +310,7 @@ $app->get('/poll/newUrls', function (Request $request) use ($app) {
         {
             $urls[] = [
                 'url' => $url->getUrl(),
+                'urlId' => $url->getUrlId(),
                 'imageUrl' => $url->getImageUrl(),
                 'title' => $url->getTitle(),
                 'username' => $url->getUser() ? $url->getUser()->getUsername() : 'Anonymous',
@@ -372,7 +376,7 @@ $app->get('/search/user/{username}', function (string $username, Request $reques
     $userEntity = $userRespository->findOneBy(['username' => $username]);
     if (empty($userEntity))
     {
-        throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
+        throw new NotFoundHttpException();
     }
     
     /* @var $likedUrlRepository LikedUrlEntityRepository */
@@ -384,6 +388,148 @@ $app->get('/search/user/{username}', function (string $username, Request $reques
         'urls' => $likedUrls,
     ]);
 })->bind('public-user');
+
+$app->get('/url/{urlId}/', function ($urlId) use ($app) {
+    /* @var $em EntityManager */
+    $em = $app['orm.em'];
+    /* @var $urlRepository UrlEntityRepository */
+    $urlRepository = $em->getRepository(UrlEntity::class);
+    /* @var $urlEntity UrlEntity */
+    $urlEntity = $urlRepository->find($urlId);
+    
+    if (empty($urlEntity))
+    {
+        throw new NotFoundHttpException();
+    }
+
+    /* @var $session \Symfony\Component\HttpFoundation\Session\Session */
+    $session = $app['session'];
+    $flashBag = $session->getFlashBag();
+
+    return $app->renderView('urlResult.html.twig', [
+        'url' => $urlEntity,
+        'flashMessage' => $flashBag->get('message', [ '' ])[0],
+        'flashMessageType' => $flashBag->get('message-type', [ 'default' ])[0],
+    ]);
+})->bind('url-details');
+
+
+$app->get('/url/{urlId}/comments', function ($urlId) use ($app) {
+    /* @var $em EntityManager */
+    $em = $app['orm.em'];
+    /* @var $urlRepository UrlEntityRepository */
+    $urlRepository = $em->getRepository(UrlEntity::class);
+    /* @var $urlEntity UrlEntity */
+    $urlEntity = $urlRepository->find($urlId);
+
+    if (empty($urlEntity))
+    {
+        throw new NotFoundHttpException();
+    }
+
+    /* @var $urlCommentRepository UrlCommentEntityRepository */
+    $urlCommentRepository = $em->getRepository(UrlCommentEntity::class);
+    $urlComments = $urlCommentRepository->getCommentsForUrlAfter($urlEntity);
+
+    return $app->renderView('urlComments.html.twig', [
+        'url' => $urlEntity,
+        'comments' => $urlComments,
+    ]);
+})->bind('url-commentList');
+
+$app->post('/user/comment/{urlId}', function ($urlId, Request $request) use ($app) {
+    /* @var $em EntityManager */
+    $em = $app['orm.em'];
+
+    /* @var $user UserEntity */
+    $user = $app['user'];
+
+    /* @var $urlRepository UrlEntityRepository */
+    $urlRepository = $em->getRepository(UrlEntity::class);
+    /* @var $urlEntity UrlEntity */
+    $urlEntity = $urlRepository->find($urlId);
+    
+    if (empty($urlEntity))
+    {
+        throw new NotFoundHttpException();
+    }
+
+    $comment = $request->get('comment');
+
+    /* @var $session \Symfony\Component\HttpFoundation\Session\Session */
+    $session = $app['session'];
+    $flashBag = $session->getFlashBag();
+
+    if (empty($comment)) {
+        $flashBag->add('message-type', 'danger');
+        $flashBag->add('message', 'Your comment was empty');
+    }
+    else
+    {
+        $comment = $urlEntity->addComment($user, $comment);
+        $em->persist($comment);
+        $em->flush();
+        
+        $flashBag->add('message-type', 'success');
+        $flashBag->add('message', 'Comment Added');
+    }
+    
+    return $app->redirect($app->url('url-details', [ 'urlId' => $urlId ]));
+})->bind('url-comment');
+
+$app->get('/poll/comments/{urlId}', function ($urlId, Request $request) use ($app) {
+    /* @var $em EntityManager */
+    $em = $app['orm.em'];
+    $lastCommentId = $request->get('lastComment') ?? '';
+
+    /* @var $urlRepository UrlEntityRepository */
+    $urlRepository = $em->getRepository(UrlEntity::class);
+    /* @var $urlEntity UrlEntity */
+    $urlEntity = $urlRepository->find($urlId);
+    
+    if (empty($urlEntity))
+    {
+        throw new NotFoundHttpException();
+    }
+
+    /* @var $urlCommentRepository UrlCommentEntityRepository */
+    $urlCommentRepository = $em->getRepository(UrlCommentEntity::class);
+    
+    $urlComment = $urlCommentRepository->find($lastCommentId);
+ 
+    $startTime = time();
+
+    //before we enter our loop we should let our session expire
+    /* @var $session \Symfony\Component\HttpFoundation\Session\Session */
+    $session = $app['session'];
+    $session->save();
+    while (time() < $startTime + 10)
+    {
+        $comments = [];
+        /* @var $urlComment UrlCommentEntity */
+        foreach ($urlCommentRepository->getCommentsForUrlAfter($urlEntity, $urlComment) as $urlComment)
+        {
+            $comments[] = [
+                'commentId' => $urlComment->getUrlCommentId(),
+                'username' => $urlComment->getAuthor()->getUsername(),
+                'timestamp' => date('F j, Y @ g:i a', $urlComment->getTimestamp()),
+                'comment' => $urlComment->getComment(),
+            ];
+        }
+
+        if (count($comments))
+        {
+            return $app->json([
+                'comments' => $comments,
+            ]);
+        }
+
+        sleep(1);
+    }
+
+    return $app->json([ 'comments' => [] ]);
+})->bind('poll-comments');
+
 
 $app->match('/logout', function () {})->bind('logout');
 //endregion

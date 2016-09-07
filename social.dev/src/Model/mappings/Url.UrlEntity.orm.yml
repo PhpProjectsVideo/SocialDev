@@ -2,7 +2,6 @@ PhpProjects\SocialDev\Model\Url\UrlEntity:
   type: entity
   repositoryClass: PhpProjects\SocialDev\Model\Url\UrlEntityRepository
   table: url
-  repositoryClass: PhpProjects\SocialDev\Model\Url\UrlEntityRepository
   id:
     urlId:
       type: string
