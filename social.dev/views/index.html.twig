@@ -11,8 +11,18 @@
         <div class="jumbotron">
             <h1>Welcome to Social.dev</h1>
             {% if app.user %}
-                <p>Hello {{ app.user.username }}! Your email is {{ app.user.email }}</p>
-                <p><a class="btn btn-danger btn-lg" href="{{ app.logout_path }}" role="button">Logout</a></p>
+                {% if app.user.fullyRegistered %}
+                    <p>Hello {{ app.user.username }}! Your email is {{ app.user.email }}</p>
+                    <p><a class="btn btn-danger btn-lg" href="{{ app.logout_path }}" role="button">Logout</a></p>
+                {% else %}
+                    <form method="post" action="{{ app.url('register') }}">
+                        {{ form_errors(form) }}
+                        {{ form_widget(form) }}
+                        <button type="submit" class="btn btn-primary btn-lg">Finish Registration</button>
+                        <a class="btn btn-danger btn-lg" href="{{ app.logout_path }}" role="button">Logout</a>
+                    </form>
+
+                {% endif %}
             {% else %}
                 <p>Why don't you join us so you can start sharing your awesome Links!</p>
                 <p><a class="btn btn-primary btn-lg" href="{{ app.login_paths.google }}" role="button">Login</a></p>

@@ -1,0 +1,17 @@
+{% extends '/base.html.twig' %}
+
+{% block body %}
+    <div>
+        {% if error is defined and error %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="danger" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <strong>Error!</strong> {{ error }}
+            </div>
+        {% endif %}
+        <div class="jumbotron">
+            <h1>Welcome to Social.dev</h1>
+            <p>Why don't you join us so you can start sharing your awesome Links!</p>
+            <p><a class="btn btn-primary btn-lg" href="{{ app.login_paths.google }}" role="button">Login</a></p>
+        </div>
+    </div>
+{% endblock %}

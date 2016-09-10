@@ -1,0 +1,27 @@
+PhpProjects\SocialDev\Model\User\UserEntity:
+  type: entity
+  table: user
+  id:
+    user_id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    googleUid:
+      type: string
+      length: 64
+      nullable: false
+      column: google_uid
+      unique: true
+    email:
+      type: string
+      length: 255
+      nullable: false
+      unique: true
+    username:
+      type: string
+      length: 100
+      nullable: false
+      unique: true
