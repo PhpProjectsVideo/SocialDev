@@ -9,8 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 require_once __DIR__.'/../vendor/autoload.php';
 require __DIR__.'/../src/config.php';
 
-$app = new SocialApplication();
-$app['debug'] = true;
+$app = new SocialApplication(['debug' => true]);
 
 $app->before(function () use ($app) {
     if (isset($app['security.token_storage'])) {

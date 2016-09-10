@@ -1,0 +1,31 @@
+PhpProjects\SocialDev\Model\Url\UrlEntity:
+  type: entity
+  repositoryClass: PhpProjects\SocialDev\Model\Url\UrlEntityRepository
+  table: url
+  repositoryClass: PhpProjects\SocialDev\Model\Url\UrlEntityRepository
+  id:
+    urlId:
+      type: string
+      length: 64
+      column: url_id
+  fields:
+    url:
+      type: string
+      length: 1024
+      nullable: false
+      column: url
+    title:
+      type: string
+      length: 255
+      nullable: false
+    description:
+      type: text
+      nullable: true
+    keywords:
+      type: text
+      nullable: true
+    imageUrl:
+      type: string
+      length: 1024
+      nullable: true
+      column: image_url

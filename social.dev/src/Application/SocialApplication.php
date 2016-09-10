@@ -69,6 +69,8 @@ class SocialApplication extends Application
             'session.db_options' => [
                 'db_table'        => 'session',
                 'db_id_col'       => 'session_id',
+                'db_id_col'       => 'session_id',
+                'db_id_col'       => 'session_id',
                 'db_data_col'     => 'session_value',
                 'db_lifetime_col' => 'session_lifetime',
                 'db_time_col'     => 'session_time',
@@ -138,6 +140,8 @@ class SocialApplication extends Application
         $this->register(new ValidatorServiceProvider());
 
         $this->register(new DoctrineOrmManagerRegistryProvider());
+
+        $this->register(new UrlServiceProvider());
     }
 
 }
