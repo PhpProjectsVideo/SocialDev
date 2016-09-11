@@ -20,7 +20,7 @@ Then on your VM, all code will be available under /var/www/social.dev. To begin 
 
 Then you need to point the social.dev domain to your new VM. You can do this using either a tool such as dnsmasq or just with a simple line in your /etc/hosts file:
 
-    192.168.56.101 beanstalkd.dev social.
+    192.168.56.101 beanstalkd.dev social.dev
 
 The beanstalkd.dev domain is for another tool we will use later in the section.
 
